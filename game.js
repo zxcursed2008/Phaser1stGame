@@ -43,7 +43,8 @@ function create ()
     platforms = this.physics.add.staticGroup();
 
         //створення платформ
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();+
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
@@ -83,18 +84,18 @@ function create ()
             setXY: { x: 12, y: 0, stepX: 70 }
         });
 
-        this.physics.add.collider(player, platforms);
-
         stars.children.iterate(function (child) {
 
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
 
-            this.physics.add.collider(player, platforms);
+        });
+
+        this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
 
         this.physics.add.overlap(player, stars, collectStar, null, this);
 
-        });
+        
 
 }
 
@@ -123,10 +124,10 @@ function update ()
         {
             player.setVelocityY(-330);
         }
+}
 
         function collectStar (player, star)
     {
         star.disableBody(true, true);
     }
 
-}
