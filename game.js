@@ -1,23 +1,30 @@
-//конфігурація
+// Конфігурація гри Phaser
 var config = {
     type: Phaser.AUTO,
+    // Ширина вікна гри
     width: 800,
+    // Висота вікна гри
     height: 600,
     physics: {
         default: 'arcade',
         arcade: {
+            // Гравітація у напрямку y
             gravity: { y: 300 },
             debug: false
         }
     },
 
     scene: {
+        // Функція завантаження ресурсів
         preload: preload,
+        // Функція створення об'єктів гри
         create: create,
+        // Функція оновлення стану гри
         update: update
     }
 };
 
+// Глобальні змінні для гравця, зірок, бомб, платформ, курсорів, рахунку та статусу гри
 var player;
 var stars;
 var bombs;
@@ -29,9 +36,10 @@ var scoreText;
 
 var game = new Phaser.Game(config);
 
+// Завантаження ресурсів перед початком гри
 function preload ()
 {
-    //створення картинок для модельок
+    // Завантаження зображень та спрайтів гравця
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
@@ -39,25 +47,25 @@ function preload ()
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
 
+// Створення елементів гри
 function create ()
 {
+    // Додавання зображення неба
     this.add.image(400, 300, 'sky');
 
     //зображення неба
         platforms = this.physics.add.staticGroup();
 
-        //створення платформ
+         // Створення статичних платформ
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
         platforms.create(600, 400, 'ground');
         platforms.create(50, 250, 'ground');
         platforms.create(750, 220, 'ground');
 
-
+    // Створення гравця та анімацій для його рухів
         player = this.physics.add.sprite(100, 450, 'dude');
-
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
-
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
@@ -78,9 +86,11 @@ function create ()
             repeat: -1
         })
 
+         // Додавання колізій між гравцем та платформами
         this.physics.add.collider(player, platforms);
         cursors = this.input.keyboard.createCursorKeys();
 
+        // Створення груп зірок
         stars = this.physics.add.group({
             key: 'star',
             repeat: 11,
@@ -88,22 +98,24 @@ function create ()
         });
 
         stars.children.iterate(function (child) {
-
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
+        // Створення групи бомб
         bombs = this.physics.add.group();
 
+        // Додавання тексту рахунку
         scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '55px', fill: '#000' });
 
+        
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
         this.physics.add.collider(bombs, platforms);
 
+        // Додавання обробника перекриття гравцем зірок
         this.physics.add.overlap(player, stars, collectStar, null, this);
 
-        
+        // Додавання обробника перекриття гравцем бомб
         this.physics.add.collider(player, bombs, hitBomb, null, this);
 
         // Додавання прослуховувача подій клавіатури для натискання клавіші "Enter"
@@ -111,12 +123,15 @@ function create ()
     }
 
         
-
+// Оновлення стану гри
 function update() {
+
+    // Перевірка, чи гра не завершилася
     if (gameOver) {
         return;
     }
 
+    // Обробка натискання клавіш для руху гравця
     if (cursors.left.isDown)
         {
             player.setVelocityX(-160);
@@ -136,6 +151,7 @@ function update() {
             player.anims.play('turn');
         }
 
+        // Обробка стрибка гравця
         if (cursors.up.isDown && player.body.touching.down)
         {
             player.setVelocityY(-330);
@@ -144,11 +160,15 @@ function update() {
         
 }
 
+// Обробка колізії між гравцем та зіркою
 function collectStar(player, star) {
+
+    // Деактивація зірки, збільшення рахунку
     star.disableBody(true, true);
     score += 10;
     scoreText.setText('Score: ' + score);
 
+    // Створення нової бомби та перевірка, чи всі зірки зібрано
     var x =(player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
     var bomb = bombs.create(x, 16, 'bomb');
     bomb.setBounce(1);
@@ -162,29 +182,17 @@ function collectStar(player, star) {
     }
 }
 
-// Функція показу додаткового екрану з текстом "Ви успішно пройшли гру"
-function showSuccessScreen() {
-    // Показати додатковий екран
-    document.getElementById('successScreen').style.display = 'block';
-}
-
-function hitBomb (player, bomb)
+    // Обробка колізії між гравцем та бомбою
+    function hitBomb (player, bomb)
 {
+       // Пауза гри, забарвлення гравця, оголошення гри закінченою
         this.physics.pause();
-
         player.setTint(0xff0000);
-
         player.anims.play('turn');
-
         gameOver = true;
 
     
 }
-
-
- // Показати вікно з текстом "Game Over" та рахунком
- document.getElementById('gameOverWindow').style.display = 'block';
- document.getElementById('finalScore').textContent = score;
 
 
 // Функція перезапуску гри
