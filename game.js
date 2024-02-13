@@ -79,7 +79,7 @@ function create ()
             repeat: -1
         })
 
-
+        this.physics.add.collider(player, platforms);
         cursors = this.input.keyboard.createCursorKeys();
 
         stars = this.physics.add.group({
@@ -107,16 +107,14 @@ function create ()
         
         this.physics.add.collider(player, bombs, hitBomb, null, this);
 
+        // Додавання прослуховувача подій клавіатури для натискання клавіші "Enter"
+        this.input.keyboard.on('keydown-ENTER', restartGame, this);
+    }
 
         
 
-}
-
 function update() {
     if (gameOver) {
-        if (cursors.space.isDown) {
-            restartGame();
-        }
         return;
     }
 
@@ -165,6 +163,11 @@ function collectStar(player, star) {
     }
 }
 
+// Функція показу додаткового екрану з текстом "Ви успішно пройшли гру"
+function showSuccessScreen() {
+    // Показати додатковий екран
+    document.getElementById('successScreen').style.display = 'block';
+}
 
 function hitBomb (player, bomb)
 {
@@ -178,6 +181,33 @@ function hitBomb (player, bomb)
 
     
 }
+
+
+ // Показати вікно з текстом "Game Over" та рахунком
+ document.getElementById('gameOverWindow').style.display = 'block';
+ document.getElementById('finalScore').textContent = score;
+
+
+// Функція перезапуску гри
+function restartGame() {
+    // Перезапуск гри лише у випадку, якщо гра завершилася
+    if (gameOver) {
+        // Перезапуск гри
+        this.scene.restart();
+        
+        // Скидання рахунку та статусу завершення гри
+        score = 0;
+        gameOver = false;
+        
+        // Оновлення відображення рахунку
+        scoreText.setText('Score: ' + score);
+
+        // Приховання вікна з повідомленням про кінець гри
+        document.getElementById('gameOverWindow').style.display = 'none';
+    }
+}
+
+
 
 
 
