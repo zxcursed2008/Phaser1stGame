@@ -105,7 +105,7 @@ function create ()
         bombs = this.physics.add.group();
 
         // Додавання тексту рахунку
-        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '55px', fill: '#000' });
+        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '55px', fill: 'white' });
 
         
         this.physics.add.collider(player, platforms);
